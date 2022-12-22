@@ -31,6 +31,29 @@ class UserController{
         res.json({"confirmação" : "usuário cadastrado"});
         
     }
+
+    async findAll(req, res){
+        try{
+            let users = await User.findAll();
+            res.json(users);
+        }catch(err){
+            console.log(err);
+        }
+    }
+
+    async findById(req, res){
+        try{
+            const id = req.params.id;
+            let userExists = await User.findById(id);
+            if(userExists){
+                res.json(userExists);
+            }
+            res.status(404);
+            res.json({});
+        }catch(err){
+            console.log(err);
+        }
+    }
 };
 
 module.exports = new UserController();
