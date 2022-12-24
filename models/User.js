@@ -1,5 +1,6 @@
 const knex = require('../database/connection');
 const bcrypt = require('bcrypt');
+const { table } = require('../database/connection');
 
 
 class User{
@@ -43,6 +44,37 @@ class User{
                 return user[0];
             }
             return null;
+        }catch(err){
+            console.log(err);
+        }
+    }
+
+    async update(id, email, name, role){
+        try{
+            let user = await this.findById(id);
+            if(user){
+                let editUser = {};
+                
+                if(email){
+                    if(email != user.email){
+                        let result = await this.findEmail(email);
+                        if(!result){
+                            editUser.email = email;
+                        }
+                    }
+                }
+
+                if(name){
+                    editUser.name = name;
+                }
+
+                if(role){
+                    editUser.role = role;
+                }
+                await knex.update(editUser).where({id}).table('users');
+                return {status:true};
+            }
+            return {status: false, error: "usuário inexistente"};
         }catch(err){
             console.log(err);
         }

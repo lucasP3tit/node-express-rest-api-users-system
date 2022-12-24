@@ -54,6 +54,22 @@ class UserController{
             console.log(err);
         }
     }
+
+    async update(req, res){
+        const { id , email, name, role } = req.body;
+        try{
+            let result = await User.update(id, email, name, role);
+            if(result.status){
+                res.status(201);
+                res.json({status: "Usuário atualizado com sucesso"});
+            }
+            res.status(400);
+            res.json(result.error);
+        }catch(err){
+            console.log(err);
+        }
+    }
+
 };
 
 module.exports = new UserController();
