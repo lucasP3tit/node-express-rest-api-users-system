@@ -63,8 +63,23 @@ class UserController{
                 res.status(201);
                 res.json({status: "Usuário atualizado com sucesso"});
             }
-            res.status(400);
+            res.status(404);
             res.json(result.error);
+        }catch(err){
+            console.log(err);
+        }
+    }
+
+    async delete(req, res){
+        try{
+            let id = req.params.id;
+            let result = await User.delete(id);
+            if(result.status){
+                res.status(200);
+                res.json({status: "Usuário deletado com sucesso"});
+            }
+            res.status(404);
+            res.json(result.erro);
         }catch(err){
             console.log(err);
         }
