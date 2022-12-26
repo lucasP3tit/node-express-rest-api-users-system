@@ -15,6 +15,18 @@ class User{
         
     }
 
+    async findByEmail(email){
+        try{
+            let user = await knex.select(['id']).where({email}).table('users');
+            if(user){
+                return  user[0];
+            }
+                return null;
+        }catch(err){
+            console.log(err);
+        }
+    }
+
     async findEmail(email){
         try{
             let result = await knex.select().where({email}).table('users');

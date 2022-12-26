@@ -7,6 +7,7 @@ var UserController = require("../controllers/UserController");
 router.get('/', HomeController.index);
 router.get('/users', UserController.findAll);
 router.get('/user/:id', UserController.findById);
+router.post('/recover-password', UserController.recoverPassword);
 router.post('/user', UserController.create);
 router.put('/user', UserController.update);
 router.delete('/user/:id', UserController.delete);
