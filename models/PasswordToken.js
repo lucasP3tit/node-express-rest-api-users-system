@@ -21,6 +21,31 @@ class PasswordToken{
         }
         return {status: false, error: "email inexistente"};
     }
+
+    async validate(token){
+        try{
+            let result = await knex.select().where({token}).table('passwordtokens');
+            if(result.length>0){
+                let tk = result[0];
+                if(tk.used === 1){
+                    return {status:false};
+                }
+                return {status:true, token: tk};
+            }
+            return false;
+        }catch(err){
+            console.log(err);
+        }
+    }
+
+    async setUsed(token){
+        try{
+            await knex.update({used:1}).where({token}).table('passwordtokens');
+        }catch(err){
+            console.log(err);
+        }
+        
+    }
     
 }
 

@@ -1,6 +1,7 @@
 const knex = require('../database/connection');
 const bcrypt = require('bcrypt');
 const { table } = require('../database/connection');
+const PasswordToken = require('./PasswordToken');
 
 
 class User{
@@ -17,7 +18,7 @@ class User{
 
     async findByEmail(email){
         try{
-            let user = await knex.select(['id']).where({email}).table('users');
+            let user = await knex.select(['id', 'password']).where({email}).table('users');
             if(user){
                 return  user[0];
             }
@@ -102,6 +103,17 @@ class User{
             return {status: false, erro: "Usuário inexistente"};
         }catch(err){
             console.log(err);
+        }
+    }
+
+    async changePassword(newPassword, id, token){
+        let hash = bcrypt.hash(newPassword, 10);
+        try{
+            await knex.update({password:hash}).where({id}).table('users');
+            await PasswordToken.setUsed(token);
+            return {status:true, msg: "Senha alterada com sucesso"};
+        }catch(err){
+            return {status:false, msg:err}
         }
     }
 }

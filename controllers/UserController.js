@@ -1,5 +1,9 @@
 const User = require('../models/User');
 const PasswordToken = require('../models/PasswordToken');
+const {v4: uuidv4} = require('uuid');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const secret = 'adsadasdsaj1120-idasida';
 
 class UserController{
 
@@ -63,7 +67,7 @@ class UserController{
             let result = await User.update(id, email, name, role);
             if(result.status){
                 res.status(201);
-                res.json({status: "Usuário atualizado com sucesso"});
+                res.json({status: "Usuário atualizado com sucesso"}, secret);
             }
             res.status(404);
             res.json(result.error);
@@ -100,6 +104,40 @@ class UserController{
         }catch (err){
             console.log(err);
         }
+    }
+
+    async changePassword(req, res){
+        let token = req.body.token;
+        let newPassword = req.body.password;
+        let isValidToken = await PasswordToken.validate(token);
+        if(isValidToken.status){
+            try{
+                await User.changePassword(newPassword, isValidToken.token.user_id, token);
+                res.status(201);
+                res.json({status:"senha alterada com sucesso."})
+            }catch(err){
+                console.log(err);
+            }
+            
+        }
+        res.status(406);
+        res.json({token: "Token inválido"});
+    }
+
+    async login(req, res){
+        const { email, password } = req.body;
+
+        let user = await User.findByEmail(email);
+        if(user){
+            let isValidPassword = await bcrypt.compare(password, user.password);
+            if(isValidPassword){
+                res.status(200);
+                let token = jwt.sign({email: user.email, role: user.role}, secret);
+                res.json({token: token});
+            }
+            res.status(406);
+        }
+        res.send('credenciais incorretas');
     }
 
 };
